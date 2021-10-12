@@ -61,6 +61,9 @@ io = {
 
 interface = {
     'show_pp': True,
+    'render_cube': True,
+    'show_ROI': True,
+    'show_withour_ROI': True,
     'show_original': True,
     'print_online': True,
     'width': 400
@@ -161,7 +164,7 @@ if __name__ == "__main__":
 
         dst = cv.undistort(img, K, dist)
 
-        if True:
+        if interface['render_cube']:
             objpoints = np.zeros((8, 3), dtype=np.float32)
             QX, QY, QZ, QL = parameters['QX'], parameters['QY'], parameters['QZ'], parameters['length']
 
@@ -201,15 +204,18 @@ if __name__ == "__main__":
             dst[cy-10:cy+10, cx] = (0, 0, 255)
 
         # if size > screen size do pyrDown
-        cv.imshow('result', dst)
-        if w > 0 and h > 0:
+        if interface['show_withour_ROI']:
+            cv.imshow('result', dst)
+
+        if w > 0 and h > 0 and interface['show_ROI']:
             cv.imshow('result with roi', dst[y:y+h, x:x+w])
+
         cv.imshow('intrinsic', np.zeros((1, int(interface['width'])), dtype=np.uint8))
         cv.imshow('extrinsic', np.zeros((1, int(interface['width'])), dtype=np.uint8))
         cv.imshow('cube', np.zeros((1, int(interface['width'])), dtype=np.uint8))
 
         key = cv.waitKey(10)
-        if key == ord('s'):
+        if key in (ord('s'), ord('S')):
             np.savetxt(io['output_dir']+'K.txt', K)
             np.savetxt(io['output_dir']+'K_original.txt', K_original)
             np.savetxt(io['output_dir']+'D.txt', dist)
