@@ -2,6 +2,14 @@
 
 An application that allows you to estimate the intrinsic and extrinsic calibration parameters of your camera using your hands and your knowledge of the scene :)
 
+From
+
+![](https://raw.githubusercontent.com/Sid1057/calibrator/main/docs/win.png)
+
+To
+
+![](https://raw.githubusercontent.com/Sid1057/calibrator/main/docs/result.png)
+
 ## Run
 
 ```sh
