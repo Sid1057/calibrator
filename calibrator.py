@@ -212,12 +212,13 @@ if __name__ == "__main__":
             dst[cy, cx-10:cx+10] = (0, 0, 255)
             dst[cy-10:cy+10, cx] = (0, 0, 255)
 
+        if w > 0 and h > 0 and interface['show_ROI']:
+            cv.rectangle(dst, (x, y), (x+w, y+h), (0, 0, 255), 1)
+            cv.imshow('result with roi', dst[y:y+h, x:x+w])
+
         # if size > screen size do pyrDown
         if interface['show_withour_ROI']:
             cv.imshow('result', dst)
-
-        if w > 0 and h > 0 and interface['show_ROI']:
-            cv.imshow('result with roi', dst[y:y+h, x:x+w])
 
         cv.imshow('intrinsic', np.zeros((1, int(interface['width'])), dtype=np.uint8))
         cv.imshow('extrinsic', np.zeros((1, int(interface['width'])), dtype=np.uint8))
