@@ -169,19 +169,21 @@ if __name__ == "__main__":
         dst = cv.undistort(img, K, dist)
 
         if interface['render_cube']:
-            objpoints = np.zeros((8, 3), dtype=np.float32)
+            objpoints = np.zeros((9, 3), dtype=np.float32)
             QX, QY, QZ = parameters['QX'], parameters['QY'], parameters['QZ']
             LX, LY, LZ = parameters['length_X'], parameters['length_Y'], parameters['length_Z']
 
-            objpoints[0] = (QX-LX/2, QY-LY/2, QZ-LZ/2)
-            objpoints[1] = (QX-LX/2, QY+LY/2, QZ-LZ/2)
-            objpoints[2] = (QX+LX/2, QY+LY/2, QZ-LZ/2)
-            objpoints[3] = (QX+LX/2, QY-LY/2, QZ-LZ/2)
+            objpoints[0] = (QX-LX/2, QY-LY, QZ-LZ/2)
+            objpoints[1] = (QX-LX/2, QY, QZ-LZ/2)
+            objpoints[2] = (QX+LX/2, QY, QZ-LZ/2)
+            objpoints[3] = (QX+LX/2, QY-LY, QZ-LZ/2)
 
-            objpoints[4] = (QX-LX/2, QY-LY/2, QZ+LZ/2)
-            objpoints[5] = (QX-LX/2, QY+LY/2, QZ+LZ/2)
-            objpoints[6] = (QX+LX/2, QY+LY/2, QZ+LZ/2)
-            objpoints[7] = (QX+LX/2, QY-LY/2, QZ+LZ/2)
+            objpoints[4] = (QX-LX/2, QY-LY, QZ+LZ/2)
+            objpoints[5] = (QX-LX/2, QY, QZ+LZ/2)
+            objpoints[6] = (QX+LX/2, QY, QZ+LZ/2)
+            objpoints[7] = (QX+LX/2, QY-LY, QZ+LZ/2)
+
+            objpoints[8] = (QX, QY, QZ)
 
             imgpoints, _ = cv.projectPoints(objpoints, rvec, tvec, K, dist)
             imgpoints = imgpoints.reshape(-1, 2).astype(np.int32)
@@ -192,6 +194,7 @@ if __name__ == "__main__":
                 cv.line(dst, tuple(imgpoints[4+i%4].tolist()), tuple(imgpoints[4+(i+1)%4].tolist()), green, 2)
             for i in range(4):
                 cv.line(dst, tuple(imgpoints[i%4].tolist()), tuple(imgpoints[4+i%4].tolist()), red, 2)
+            cv.circle(dst, tuple(imgpoints[8].tolist()), 3, (0, 0, 255), cv.FILLED)
             for i in range(4):
                 cv.line(dst, tuple(imgpoints[i%4].tolist()), tuple(imgpoints[(i+1)%4].tolist()), blue, 2)
 
