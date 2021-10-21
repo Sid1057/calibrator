@@ -75,7 +75,15 @@ R:
         step: 1e-3
 
 CUBE:
-    length:
+    length_X:
+        max_val: 5
+        min_val: 1
+        step: 1e-1
+    length_Y:
+        max_val: 5
+        min_val: 1
+        step: 1e-1
+    length_Z:
         max_val: 5
         min_val: 1
         step: 1e-1
