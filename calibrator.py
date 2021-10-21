@@ -184,11 +184,11 @@ if __name__ == "__main__":
             green = (0, 255, 0)
             red = (0, 0, 255)
             for i in range(4):
-                cv.line(dst, imgpoints[4+i%4], imgpoints[4+(i+1)%4], green, 2)
+                cv.line(dst, tuple(imgpoints[4+i%4].tolist()), tuple(imgpoints[4+(i+1)%4].tolist()), green, 2)
             for i in range(4):
-                cv.line(dst, imgpoints[i%4], imgpoints[4+i%4], red, 2)
+                cv.line(dst, tuple(imgpoints[i%4].tolist()), tuple(imgpoints[4+i%4].tolist()), red, 2)
             for i in range(4):
-                cv.line(dst, imgpoints[i%4], imgpoints[(i+1)%4], blue, 2)
+                cv.line(dst, tuple(imgpoints[i%4].tolist()), tuple(imgpoints[(i+1)%4].tolist()), blue, 2)
 
         # optimal matrix
         h, w = img.shape[:2]
