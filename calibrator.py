@@ -3,6 +3,7 @@ import numpy as np
 import yaml
 import weakref
 import argparse
+import json
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--img", type=str, help="Path for yor uncalibrated img")
@@ -105,7 +106,7 @@ def create_ui():
         def trackbar_handler(val):
             parameters[key] = val * step + alpha
             if interface['print_online']:
-                print(parameters)
+                print(json.dumps(parameters, sort_keys=False, indent=4))
 
         return trackbar_handler
 
@@ -114,7 +115,7 @@ def create_ui():
         min_val = float(key_node[name]['min_val'])
         max_val = int((float(key_node[name]['max_val']) - min_val) / step)
         val = int(default_value / step) if default_value is not None else int( max_val / 2 )
-        print(min_val, step, max_val)
+
         cv.createTrackbar(
             name, window_name, val, max_val, create_trackbar_parameters_handler( name, step, min_val ) )
 
