@@ -51,7 +51,9 @@ parameters = {
     'QX': 0,
     'QY': 0,
     'QZ': 0,
-    'length': 0,
+    'length_X': 0,
+    'length_Y': 0,
+    'length_Z': 0,
 }
 
 io = {
@@ -133,7 +135,9 @@ def create_ui():
     create_trackbar('extrinsic', 'Z', config['T'])
 
 
-    create_trackbar('cube', 'length', config['CUBE'], default_value=1)
+    create_trackbar('cube', 'length_X', config['CUBE'], default_value=1)
+    create_trackbar('cube', 'length_Y', config['CUBE'], default_value=1)
+    create_trackbar('cube', 'length_Z', config['CUBE'], default_value=1)
     create_trackbar('cube', 'QX', config['CUBE'])
     create_trackbar('cube', 'QY', config['CUBE'])
     create_trackbar('cube', 'QZ', config['CUBE'], default_value=5)
@@ -166,17 +170,18 @@ if __name__ == "__main__":
 
         if interface['render_cube']:
             objpoints = np.zeros((8, 3), dtype=np.float32)
-            QX, QY, QZ, QL = parameters['QX'], parameters['QY'], parameters['QZ'], parameters['length']
+            QX, QY, QZ = parameters['QX'], parameters['QY'], parameters['QZ']
+            LX, LY, LZ = parameters['length_X'], parameters['length_Y'], parameters['length_Z']
 
-            objpoints[0] = (QX-QL/2, QY-QL/2, QZ-QL/2)
-            objpoints[1] = (QX-QL/2, QY+QL/2, QZ-QL/2)
-            objpoints[2] = (QX+QL/2, QY+QL/2, QZ-QL/2)
-            objpoints[3] = (QX+QL/2, QY-QL/2, QZ-QL/2)
+            objpoints[0] = (QX-LX/2, QY-LY/2, QZ-LZ/2)
+            objpoints[1] = (QX-LX/2, QY+LY/2, QZ-LZ/2)
+            objpoints[2] = (QX+LX/2, QY+LY/2, QZ-LZ/2)
+            objpoints[3] = (QX+LX/2, QY-LY/2, QZ-LZ/2)
 
-            objpoints[4] = (QX-QL/2, QY-QL/2, QZ+QL/2)
-            objpoints[5] = (QX-QL/2, QY+QL/2, QZ+QL/2)
-            objpoints[6] = (QX+QL/2, QY+QL/2, QZ+QL/2)
-            objpoints[7] = (QX+QL/2, QY-QL/2, QZ+QL/2)
+            objpoints[4] = (QX-LX/2, QY-LY/2, QZ+LZ/2)
+            objpoints[5] = (QX-LX/2, QY+LY/2, QZ+LZ/2)
+            objpoints[6] = (QX+LX/2, QY+LY/2, QZ+LZ/2)
+            objpoints[7] = (QX+LX/2, QY-LY/2, QZ+LZ/2)
 
             imgpoints, _ = cv.projectPoints(objpoints, rvec, tvec, K, dist)
             imgpoints = imgpoints.reshape(-1, 2).astype(np.int32)
