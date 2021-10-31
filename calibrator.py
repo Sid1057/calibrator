@@ -22,6 +22,29 @@ with open(args.config, 'r') as stream:
 
 img = cv.imread(args.img)
 
+roi_node = {
+    'roi_x': {
+        'min_val': 0,
+        'max_val': img.shape[1],
+        'step': 1
+    },
+    'roi_y': {
+        'min_val': 0,
+        'max_val': img.shape[0],
+        'step': 1
+    },
+    'roi_w': {
+        'min_val': 0,
+        'max_val': img.shape[1],
+        'step': 1
+    },
+    'roi_h': {
+        'min_val': 0,
+        'max_val': img.shape[0],
+        'step': 1
+    },
+}
+
 K = np.zeros((3, 3), dtype=np.float32)
 K[2][2] = 1
 dist = np.zeros((1, 5), dtype=np.float32)
@@ -55,6 +78,11 @@ parameters = {
     'length_X': 0,
     'length_Y': 0,
     'length_Z': 0,
+
+    'roi_x': 0,
+    'roi_y': 0,
+    'roi_w': img.shape[1],
+    'roi_h': img.shape[0],
 }
 
 io = {
@@ -68,6 +96,7 @@ interface = {
     'show_ROI': True,
     'show_withour_ROI': True,
     'show_original': True,
+    'custom_roi': True,
     'print_online': True,
     'width': 400
 }
@@ -100,7 +129,11 @@ def create_ui():
     interface['show_pp'] = bool(config['interface']['show_pp'])
     interface['show_original'] = bool(config['interface']['show_original'])
     interface['print_online'] = bool(config['interface']['print_online'])
+    interface['custom_roi'] = bool(config['interface']['custom_roi'])
     interface['width'] = int(config['interface']['width'])
+
+    if interface['custom_roi'] is True:
+        cv.namedWindow('roi')
 
     def create_trackbar_parameters_handler(key, step, alpha):
         def trackbar_handler(val):
@@ -134,6 +167,11 @@ def create_ui():
     create_trackbar('extrinsic', 'X', config['T'])
     create_trackbar('extrinsic', 'Y', config['T'])
     create_trackbar('extrinsic', 'Z', config['T'])
+
+    create_trackbar('roi', 'roi_x', roi_node, default_value=0)
+    create_trackbar('roi', 'roi_y', roi_node, default_value=0)
+    create_trackbar('roi', 'roi_w', roi_node, default_value=img.shape[1])
+    create_trackbar('roi', 'roi_h', roi_node, default_value=img.shape[0])
 
 
     create_trackbar('cube', 'length_X', config['CUBE'], default_value=1)
@@ -200,11 +238,26 @@ if __name__ == "__main__":
                 cv.line(dst, tuple(imgpoints[i%4].tolist()), tuple(imgpoints[(i+1)%4].tolist()), blue, 2)
 
         # optimal matrix
+        x, y = 0, 0
         h, w = img.shape[:2]
         K_original = K.copy()
 
-        K, roi = cv.getOptimalNewCameraMatrix(
-            K, dist, (w, h), 1, (w,h))
+        if interface['custom_roi']:
+            x = min(max(0, parameters['roi_x']), img.shape[1]-2)
+            y = min(max(0, parameters['roi_y']), img.shape[0]-2)
+            w = min(max(2, parameters['roi_w']), img.shape[1])
+            h = min(max(2, parameters['roi_h']), img.shape[0])
+        else:
+            _, roi = cv.getOptimalNewCameraMatrix(
+                K, dist, (w, h), 1, (w,h))
+            x, y, w, h = roi
+            parameters['roi_x'] = x
+            parameters['roi_y'] = y
+            parameters['roi_w'] = w
+            parameters['roi_h'] = h
+        K[0][2] -= x
+        K[1][2] -= y
+        roi = np.asarray((x, y, w, h)).astype(np.int32)
         x, y, w, h = roi
 
         if interface['show_pp']:
@@ -223,6 +276,9 @@ if __name__ == "__main__":
         cv.imshow('intrinsic', np.zeros((1, int(interface['width'])), dtype=np.uint8))
         cv.imshow('extrinsic', np.zeros((1, int(interface['width'])), dtype=np.uint8))
         cv.imshow('cube', np.zeros((1, int(interface['width'])), dtype=np.uint8))
+
+        if interface['custom_roi']:
+            cv.imshow('roi', np.zeros((1, int(interface['width'])), dtype=np.uint8))
 
         key = cv.waitKey(10)
         if key in (ord('s'), ord('S')):

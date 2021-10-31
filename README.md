@@ -50,6 +50,7 @@ starts in `interface`
 |show_ROI|show undistorted image after roi selecting|
 |show_withour_ROI|show undistorted image before roi selecting|
 |show_original|show original uncalibrated image|
+|custom_roi|allow you to choose roi value manually|
 |print_online|update actual parameters information in terminal|
 |width|interface window width|
 
@@ -102,6 +103,7 @@ Sections:
 |intrinsic|slide bar for intrinsic camera calibration parameters|
 |extrinsic|slide bar for intrinsic camera calibration parameters|
 |cube|slide bar for physical virtual cube parameters|
+|roi|slide bar for roi parameters modifying|
 |original|original image|
 |result|image after applying calibration parameters|
 |result with ROI|image after applying calibration parameters and ROI selection|

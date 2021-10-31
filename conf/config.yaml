@@ -7,6 +7,7 @@ interface:
     show_ROI: True
     show_withour_ROI: True
     show_original: False
+    custom_roi: True
     print_online: True
     width: 400
 
