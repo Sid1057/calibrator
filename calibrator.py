@@ -101,6 +101,34 @@ interface = {
     'width': 400
 }
 
+def render_bev(dst, K, dist, rvec, tvec):
+    global parameters, img, io, interface, config
+    roi_near = 0
+    roi_left = -10
+    roi_right = 10
+    roi_length = 20
+    scale = 25
+
+    bev_w, bev_h = (roi_right-roi_left)*scale, (roi_length-roi_near)*scale
+
+    obj_points = np.array([
+        [roi_left, 0, roi_near],
+        [roi_left, 0, roi_length],
+        [roi_right, 0, roi_length],
+        [roi_right, 0, roi_near]], dtype=np.float32)
+
+    img_points = np.array([
+        [0, bev_h],
+        [0, 0],
+        [bev_w, 0],
+        [bev_w, bev_h]], dtype=np.float32)
+
+    result = cv.projectPoints(obj_points, rvec, tvec, K, dist)[0].reshape(-1, 2).astype(np.float32)
+    M = cv.getPerspectiveTransform(result, img_points)
+    return cv.warpPerspective(dst, M, (bev_w, bev_h))
+
+
+
 def project_cube():
     global parameters, img, io, interface, config
     dist = np.zeros((1, 5), dtype=np.float32)
@@ -160,8 +188,8 @@ def create_ui():
     create_trackbar('intrinsic', 'CY', config['K'], default_value=img.shape[0]/2)
 
 
-    create_trackbar('extrinsic', 'yaw', config['R'])
     create_trackbar('extrinsic', 'pitch', config['R'])
+    create_trackbar('extrinsic', 'yaw', config['R'])
     create_trackbar('extrinsic', 'roll', config['R'])
 
     create_trackbar('extrinsic', 'X', config['T'])
@@ -197,8 +225,8 @@ if __name__ == "__main__":
         K[0][2] = parameters['CX']
         K[1][2] = parameters['CY']
 
-        rvec[0][0] = parameters['yaw']
-        rvec[0][1] = parameters['pitch']
+        rvec[0][0] = parameters['pitch']
+        rvec[0][1] = parameters['yaw']
         rvec[0][2] = parameters['roll']
 
         tvec[0][0] = parameters['X']
@@ -206,6 +234,7 @@ if __name__ == "__main__":
         tvec[0][2] = parameters['Z']
 
         dst = cv.undistort(img, K, dist)
+        bev = None
 
         if interface['render_cube']:
             objpoints = np.zeros((9, 3), dtype=np.float32)
@@ -236,6 +265,9 @@ if __name__ == "__main__":
             cv.circle(dst, tuple(imgpoints[8].tolist()), 3, (0, 0, 255), cv.FILLED)
             for i in range(4):
                 cv.line(dst, tuple(imgpoints[i%4].tolist()), tuple(imgpoints[(i+1)%4].tolist()), blue, 2)
+
+            bev = render_bev(dst, K, dist, rvec, tvec)
+            cv.imshow('bev', bev)
 
         # optimal matrix
         x, y = 0, 0
